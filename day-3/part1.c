@@ -46,10 +46,6 @@ int main(int argc, char *argv[]) {
         for (linePtr = buffer; *linePtr != '\0'; linePtr++) {
             *(input_index++) = *linePtr;
         }
-        // If file does not end on an empty line. Fill all the realloc mem
-        if (*(linePtr - 1) != '\n') {
-            *input_index = '\0';
-        }
     }
 
     // for (int r = 0; r < row; r++) {
@@ -70,7 +66,7 @@ int main(int argc, char *argv[]) {
                     start = input + (r * col_count + c);
                     c_l = c - 1 >= 0 ? c - 1 : c;
                     r_a = r - 1 >= 0 ? r - 1 : r;
-                    r_b = r + 1 >= 0 ? r + 1 : r;
+                    r_b = r + 1 <= row ? r + 1 : r;
                     valid_part = 0;
                 }
             } else if (start != NULL) {
