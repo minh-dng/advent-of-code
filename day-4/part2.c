@@ -5,27 +5,15 @@
 
 int is_a_num_char(char *p_char) { return (*p_char >= '0' && *p_char <= '9'); }
 
-int extract_int(char **p_start) {
-    char *p_end = *p_start;
-    while (is_a_num_char(p_end)) p_end++;
-    size_t length = p_end - *p_start;
-    char tmp[length + 1];
-    tmp[length] = '\0';
-    memcpy(tmp, *p_start, length);
-    *p_start = p_end;
-    return (int)strtol(tmp, (char **)NULL, 10);
-}
-
 int main(int argc, char *argv[]) {
-    FILE *file = fopen(argv[1], "r");
+    FILE *p_file = fopen(argv[1], "r");
     int res = 0;
     char buffer[500];
     int tmpNum;
     int cardQuantity = 0;
-    // Initialise first list elemenent as 1
     int *cardInstancesCount = NULL;
 
-    for (int cardIdx = 0; fgets(buffer, sizeof(buffer), file); cardIdx++) {
+    for (int cardIdx = 0; fgets(buffer, sizeof(buffer), p_file); cardIdx++) {
         int *win = NULL;
         int *own = NULL;
         int winIdx = 0;
@@ -41,14 +29,13 @@ int main(int argc, char *argv[]) {
             if (!is_a_num_char(p_line)) {
                 continue;
             }
-            tmpNum = extract_int(&p_line);
+            tmpNum = strtol(p_line, &p_line, 10);
             int *tmp = realloc(win, sizeof(int) * (winIdx + 1));
             if (tmp == NULL) {
                 printf("%s\n", "Memory Allocation Failed");
                 return 1;
             }
             win = tmp;
-            tmp = NULL;
             win[winIdx++] = tmpNum;
         }
 
@@ -57,14 +44,13 @@ int main(int argc, char *argv[]) {
             if (!is_a_num_char(p_line)) {
                 continue;
             }
-            tmpNum = extract_int(&p_line);
+            tmpNum = strtol(p_line, &p_line, 10);
             int *tmp = realloc(own, sizeof(int) * (ownIdx + 1));
             if (tmp == NULL) {
                 printf("%s\n", "Memory Allocation Failed");
                 return 1;
             }
             own = tmp;
-            tmp = NULL;
             own[ownIdx++] = tmpNum;
         }
 
@@ -81,19 +67,14 @@ int main(int argc, char *argv[]) {
         free(own);
 
         if (cardQuantity == cardIdx) {
-            printf("%p\n", &cardInstancesCount);
             int *tmp =
-                realloc(cardInstancesCount, sizeof(int) * (cardQuantity + 1));
-            if (tmp = NULL) {
+                realloc(cardInstancesCount, sizeof(int) * (++cardQuantity));
+            if (tmp == NULL) {
                 printf("%s\n", "Memory Allocation Failed");
                 return 1;
             }
             cardInstancesCount = tmp;
-            printf("%p\n", &cardInstancesCount);
             cardInstancesCount[cardIdx] = 1;
-            printf("%s\n", "no");
-            printf("%d",*cardInstancesCount);
-            tmp = NULL;
         }
 
         // If need to expand cardQuantity
@@ -128,10 +109,13 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    fclose(p_file);
+
     for (int i = 0; i < cardQuantity; i++) {
-        printf("%d", cardInstancesCount[i]);
+        res += cardInstancesCount[i];
     }
     free(cardInstancesCount);
+
     printf("Res: %d\n", res);
     return 0;
 }
