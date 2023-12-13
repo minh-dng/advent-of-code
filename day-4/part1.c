@@ -5,24 +5,13 @@
 
 int is_a_num_char(char *p_char) { return (*p_char >= '0' && *p_char <= '9'); }
 
-int extract_int(char **p_start) {
-    char *p_end = *p_start;
-    while (is_a_num_char(p_end)) p_end++;
-    size_t length = p_end - *p_start;
-    char tmp[length + 1];
-    tmp[length] = '\0';
-    memcpy(tmp, *p_start, length);
-    *p_start = p_end;
-    return (int)strtol(tmp, (char **)NULL, 10);
-}
-
 int main(int argc, char *argv[]) {
-    FILE *file = fopen(argv[1], "r");
+    FILE *p_file = fopen(argv[1], "r");
     int res = 0;
     char buffer[500];
     int tmpNum;
 
-    while (fgets(buffer, sizeof(buffer), file)) {
+    while (fgets(buffer, sizeof(buffer), p_file)) {
         int *win = NULL;
         int *own = NULL;
         int winIdx = 0;
@@ -35,7 +24,7 @@ int main(int argc, char *argv[]) {
             if (!is_a_num_char(p_line)) {
                 continue;
             }
-            tmpNum = extract_int(&p_line);
+            tmpNum = strtol(p_line, &p_line, 10);
             int *tmp = realloc(win, sizeof(int) * (winIdx + 1));
             if (tmp == NULL) {
                 printf("%s\n", "Memory Allocation Failed");
@@ -48,7 +37,7 @@ int main(int argc, char *argv[]) {
             if (!is_a_num_char(p_line)) {
                 continue;
             }
-            tmpNum = extract_int(&p_line);
+            tmpNum = strtol(p_line, &p_line, 10);
             int *tmp = realloc(own, sizeof(int) * (ownIdx + 1));
             if (tmp == NULL) {
                 printf("%s\n", "Memory Allocation Failed");
@@ -71,6 +60,8 @@ int main(int argc, char *argv[]) {
         free(win);
         free(own);
     }
+    fclose(p_file);
+
     printf("Res: %d\n", res);
     return 0;
 }
