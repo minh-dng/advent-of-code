@@ -1,0 +1,22 @@
+typeArr size: 56
+min: 79 max: 92
+98
+50
+min: 81 max: 94
+15
+Splitting
+min: 81 max: 51
+53
+min: 81 max: 40
+18
+Splitting
+min: 74 max: 24
+77
+45
+min: 78 max: 24
+69
+min: 78 max: 25
+56
+min: 82 max: 25
+Min: 82
+Res: -1
