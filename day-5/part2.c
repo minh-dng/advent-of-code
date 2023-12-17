@@ -38,9 +38,6 @@ long findDest(long src, struct type *map) {
 
 void findArrayOfSmallest(long min, long max, long *res,
                          struct type **typeArr[7], int typeIdx) {
-    if (min > max) {
-        printf("\n%s", "😡Invalid Range");
-    }
     printf("\nMin: %ld Max: %ld\n", min, max);
     if (typeIdx == 7) {
         if (min < *res || *res == -1) {
@@ -53,16 +50,15 @@ void findArrayOfSmallest(long min, long max, long *res,
     struct node *pDestNode = (*(typeArr[typeIdx]))->headDest;
     while (pSrcNode != NULL) {
         printf("%ld  ", pSrcNode->data.min);
-        if (min < pSrcNode->data.min || min > pSrcNode->data.max) {
-            pDestNode = pDestNode->next;
-            pSrcNode = pSrcNode->next;
-        } else if (max <= pSrcNode->data.max) {
+        if (min >= pSrcNode->data.min && max <= pSrcNode->data.max) {
+            // In range
             findArrayOfSmallest(findDest(min, (*(typeArr[typeIdx]))),
                                 findDest(max, (*(typeArr[typeIdx]))), res,
                                 typeArr, typeIdx + 1);
             return;
-        } else {
-            printf("\n%s", "Splitting🪓");
+        } else if (min >= pSrcNode->data.min && min <= pSrcNode->data.max &&
+                   max > pSrcNode->data.max) {
+            printf("\n%s", "🪓 Min in range, max out of range");
             findArrayOfSmallest(
                 findDest(min, (*(typeArr[typeIdx]))),
                 findDest(pSrcNode->data.max, (*(typeArr[typeIdx]))), res,
@@ -70,6 +66,30 @@ void findArrayOfSmallest(long min, long max, long *res,
             findArrayOfSmallest(pSrcNode->data.max + 1, max, res, typeArr,
                                 typeIdx);
             return;
+        } else if (min < pSrcNode->data.min && max <= pSrcNode->data.max &&
+                   max >= pSrcNode->data.min) {
+            printf("\n%s", "🪓 Min out of range, max in range");
+            findArrayOfSmallest(min, pSrcNode->data.min - 1, res, typeArr,
+                                typeIdx);
+            findArrayOfSmallest(
+                findDest(pSrcNode->data.min, (*(typeArr[typeIdx]))),
+                findDest(max, (*(typeArr[typeIdx]))), res, typeArr,
+                typeIdx + 1);
+            return;
+        } else if (min < pSrcNode->data.min && max > pSrcNode->data.max) {
+            printf("\n%s", "Min and max out of range, range in the middle🪓");
+            findArrayOfSmallest(min, pSrcNode->data.min - 1, res, typeArr,
+                                typeIdx);
+            findArrayOfSmallest(
+                findDest(pSrcNode->data.min, (*(typeArr[typeIdx]))),
+                findDest(pSrcNode->data.max, (*(typeArr[typeIdx]))), res,
+                typeArr, typeIdx + 1);
+            findArrayOfSmallest(pSrcNode->data.max + 1, max, res, typeArr,
+                                typeIdx);
+            return;
+        } else {
+            pDestNode = pDestNode->next;
+            pSrcNode = pSrcNode->next;
         }
     }
     findArrayOfSmallest(findDest(min, (*(typeArr[typeIdx]))),
@@ -78,30 +98,20 @@ void findArrayOfSmallest(long min, long max, long *res,
     return;
 }
 
-void sortTypeArr(struct type **typeArr[7]) {
-    for (int i = 0; i < 7; i++) {
-        struct node *pSrcNode = (*(typeArr[i]))->headSrc;
-        struct node *pDestNode = (*(typeArr[i]))->headDest;
-        while (pSrcNode != NULL) {
-            struct node *pTmpSrcNode = pSrcNode->next;
-            struct node *pTmpDestNode = pDestNode->next;
-            while (pTmpSrcNode != NULL) {
-                if (pTmpSrcNode->data.min < pSrcNode->data.min) {
-                    // Swap
-                    struct range tmpRange = pSrcNode->data;
-                    pSrcNode->data = pTmpSrcNode->data;
-                    pTmpSrcNode->data = tmpRange;
-                    tmpRange = pDestNode->data;
-                    pDestNode->data = pTmpDestNode->data;
-                    pTmpDestNode->data = tmpRange;
-                }
-                pTmpSrcNode = pTmpSrcNode->next;
-                pTmpDestNode = pTmpDestNode->next;
-            }
-            pSrcNode = pSrcNode->next;
-            pDestNode = pDestNode->next;
-        }
+void freeType(struct type *type) {
+    struct node *pDestNode = type->headDest;
+    struct node *pSrcNode = type->headSrc;
+    while (pDestNode != NULL) {
+        struct node *tmp = pDestNode;
+        pDestNode = pDestNode->next;
+        free(tmp);
     }
+    while (pSrcNode != NULL) {
+        struct node *tmp = pSrcNode;
+        pSrcNode = pSrcNode->next;
+        free(tmp);
+    }
+    free(type);
 }
 
 int main(int argc, char *argv[]) {
@@ -122,7 +132,7 @@ int main(int argc, char *argv[]) {
     fgets(buffer, sizeof(buffer), p_file);
     char *pEnd = buffer;
     while (1) {
-        while (*pEnd != ' ') {
+        while (*pEnd != ' ' && *pEnd != '\0') {
             pEnd++;
         }
         long tmpNum = strtol(pEnd, &pEnd, 10);
@@ -198,30 +208,14 @@ int main(int argc, char *argv[]) {
     struct type **typeArr[7] = {&seedSoil,  &soilFert,  &fertWater, &waterLight,
                                 &lightTemp, &tempHumid, &humidLoc};
 
-
     for (int i = 0; i < seedCount - 1; i += 2) {
-        //     for (long j = 0; j < seeds[i + 1]; j++) {
-        //         printf("Seed: %ld ", seeds[i] + j);
-        //         long soil = findDest(seeds[i] + j, seedSoil);
-        //         long fert = findDest(soil, soilFert);
-        //         long water = findDest(fert, fertWater);
-        //         long light = findDest(water, waterLight);
-        //         long temp = findDest(light, lightTemp);
-        //         long humid = findDest(temp, tempHumid);
-        //         long dest = findDest(humid, humidLoc);
-        //         if (res == -1 || res > dest) {
-        //             res = dest;
-        //         }
-        //         printf("Dest: %ld\n", dest);
-        //     }
-        // }
-        // printf("soil: %ld, %ld\n", findDest(79, seedSoil), findDest(92,
-        // seedSoil));
         printf("🌱Seed: %ld", seeds[i]);
         findArrayOfSmallest(seeds[i], seeds[i] + seeds[i + 1] - 1, &res,
                             typeArr, 0);
-        // printf("test: %ld\n", (*(typeArr[1]))->headDest->data.max);
-        // printf("test: %ld\n", (*(typeArr[0]))->headDest->data.min);
+    }
+    free(seeds);
+    for (int i = 0; i < 7; i++) {
+        freeType(*(typeArr[i]));
     }
 
     printf("Res: %ld\n", res);
