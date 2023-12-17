@@ -36,8 +36,25 @@ long findDest(long src, struct type *map) {
     return dest;
 }
 
+void freeType(struct type *type) {
+    struct node *pDestNode = type->headDest;
+    struct node *pSrcNode = type->headSrc;
+    while (pDestNode != NULL) {
+        struct node *tmp = pDestNode;
+        pDestNode = pDestNode->next;
+        free(tmp);
+    }
+    while (pSrcNode != NULL) {
+        struct node *tmp = pSrcNode;
+        pSrcNode = pSrcNode->next;
+        free(tmp);
+    }
+    free(type);
+}
+
 int main(int argc, char *argv[]) {
-    FILE *p_file = fopen(argv[1], "r");
+    (void)argc;
+    FILE *pFile = fopen(argv[1], "r");
     long res = -1;
     char buffer[500];
     long *seeds = NULL;
@@ -51,10 +68,10 @@ int main(int argc, char *argv[]) {
     struct type *tempHumid = NULL;
     struct type *humidLoc = NULL;
 
-    fgets(buffer, sizeof(buffer), p_file);
+    fgets(buffer, sizeof(buffer), pFile);
     char *pEnd = buffer;
     while (1) {
-        while (*pEnd != ' ') {
+        while (*pEnd != ' ' && *pEnd != '\0') {
             pEnd++;
         }
         long tmpNum = strtol(pEnd, &pEnd, 10);
@@ -71,7 +88,7 @@ int main(int argc, char *argv[]) {
     }
 
     struct type **map;
-    while (fgets(buffer, sizeof(buffer), p_file)) {
+    while (fgets(buffer, sizeof(buffer), pFile)) {
         char *pLine = buffer;
         if (*pLine == '\n') continue;
         if (strcmp("seed-to-soil map:\n", buffer) == 0) {
@@ -125,7 +142,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    fclose(p_file);
+    fclose(pFile);
 
     for (int i = 0; i < seedCount; i++) {
         printf("Seed: %ld ", seeds[i]);
@@ -141,6 +158,14 @@ int main(int argc, char *argv[]) {
         }
         printf("Dest: %ld\n", dest);
     }
+    free(seeds);
+    freeType(seedSoil);
+    freeType(soilFert);
+    freeType(fertWater);
+    freeType(waterLight);
+    freeType(lightTemp);
+    freeType(tempHumid);
+    freeType(humidLoc);
 
     printf("Res: %ld\n", res);
     return 0;
