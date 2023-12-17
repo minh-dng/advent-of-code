@@ -115,6 +115,7 @@ void freeType(struct type *type) {
 }
 
 int main(int argc, char *argv[]) {
+    (void)argc;
     FILE *pFile = fopen(argv[1], "r");
     long res = -1;
     char buffer[500];
