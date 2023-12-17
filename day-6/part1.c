@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     fgets(buffer, sizeof(buffer), pFile);
     char *pEnd = buffer;
     while (1) {
-        while (*pEnd != ' ') {
+        while (*pEnd != ' ' && *pEnd != '\0') {
             pEnd++;
         }
         int tmpNum = strtol(pEnd, &pEnd, 10);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     fgets(buffer, sizeof(buffer), pFile);
     pEnd = buffer;
     distance = malloc(sizeof(int) * raceCount);
-    while (*pEnd != ' ') {
+    while (*pEnd != ' ' && *pEnd != '\0') {
         pEnd++;
     }
     for (int i = 0; i < raceCount; i++) {
