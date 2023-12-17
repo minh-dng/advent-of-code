@@ -115,7 +115,7 @@ void freeType(struct type *type) {
 }
 
 int main(int argc, char *argv[]) {
-    FILE *p_file = fopen(argv[1], "r");
+    FILE *pFile = fopen(argv[1], "r");
     long res = -1;
     char buffer[500];
     long *seeds = NULL;
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     struct type *tempHumid = NULL;
     struct type *humidLoc = NULL;
 
-    fgets(buffer, sizeof(buffer), p_file);
+    fgets(buffer, sizeof(buffer), pFile);
     char *pEnd = buffer;
     while (1) {
         while (*pEnd != ' ' && *pEnd != '\0') {
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     }
 
     struct type **map;
-    while (fgets(buffer, sizeof(buffer), p_file)) {
+    while (fgets(buffer, sizeof(buffer), pFile)) {
         char *pLine = buffer;
         if (*pLine == '\n') continue;
         if (strcmp("seed-to-soil map:\n", buffer) == 0) {
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    fclose(p_file);
+    fclose(pFile);
 
     struct type **typeArr[7] = {&seedSoil,  &soilFert,  &fertWater, &waterLight,
                                 &lightTemp, &tempHumid, &humidLoc};
