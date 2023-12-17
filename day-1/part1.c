@@ -4,14 +4,14 @@
 
 int main(int argc, char *argv[]) {
     char buffer[1024];
-    unsigned int calibration_value = 0;
-    FILE *file = fopen(argv[1], "r");
-    if (file == NULL) {
+    unsigned int calibrationVal = 0;
+    FILE *pFile = fopen(argv[1], "r");
+    if (pFile == NULL) {
         printf("Failed to open file\n");
         return 1;
     }
 
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    while (fgets(buffer, sizeof(buffer), pFile) != NULL) {
         unsigned int first = 0;
         unsigned int last = 0;
         char *linePtr;
@@ -19,15 +19,14 @@ int main(int argc, char *argv[]) {
             if (*linePtr >= '0' && *linePtr <= '9') {
                 if (!first) {
                     first = *linePtr - '0';
-                    last = *linePtr - '0';
-                } else {
-                    last = *linePtr - '0';
                 }
+                last = *linePtr - '0';
             }
         }
         printf("%d, %d\n", first, last);
-        calibration_value += first * 10 + last;
+        calibrationVal += first * 10 + last;
     }
-    printf("%d\n", calibration_value);
+    fclose(pFile);
+    printf("%d\n", calibrationVal);
     return 0;
 }

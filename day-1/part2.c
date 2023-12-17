@@ -4,17 +4,17 @@
 
 int main(int argc, char *argv[]) {
     char buffer[1024];
-    unsigned int calibration_value = 0;
-    const char *num_str[9] = {"one", "two",   "three", "four", "five",
-                              "six", "seven", "eight", "nine"};
+    unsigned int calibrationVal = 0;
+    const char *numStr[9] = {"one", "two",   "three", "four", "five",
+                             "six", "seven", "eight", "nine"};
 
-    FILE *file = fopen(argv[1], "r");
-    if (file == NULL) {
+    FILE *pFile = fopen(argv[1], "r");
+    if (pFile == NULL) {
         printf("Failed to open file\n");
         return 1;
     }
 
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    while (fgets(buffer, sizeof(buffer), pFile) != NULL) {
         unsigned int first = 0;
         unsigned int last = 0;
         char *startSearchPtr = buffer;
@@ -23,10 +23,8 @@ int main(int argc, char *argv[]) {
             if (*linePtr >= '0' && *linePtr <= '9') {
                 if (!first) {
                     first = *linePtr - '0';
-                    last = *linePtr - '0';
-                } else {
-                    last = *linePtr - '0';
                 }
+                last = *linePtr - '0';
                 startSearchPtr = linePtr + 1;
             } else {
                 // https://stackoverflow.com/q/69735716/14046889
@@ -46,14 +44,12 @@ int main(int argc, char *argv[]) {
                 memcpy(temp, startSearchPtr, length);
 
                 for (int i = 0; i < 9; i++) {
-                    char *chrPtr = strstr(temp, num_str[i]);
+                    char *chrPtr = strstr(temp, numStr[i]);
                     if (chrPtr != NULL) {
                         if (!first) {
                             first = i + 1;
-                            last = i + 1;
-                        } else {
-                            last = i + 1;
                         }
+                        last = i + 1;
                         startSearchPtr = linePtr;
                         break;
                     }
@@ -61,8 +57,9 @@ int main(int argc, char *argv[]) {
             }
         }
         printf("%d, %d\n", first, last);
-        calibration_value += first * 10 + last;
+        calibrationVal += first * 10 + last;
     }
-    printf("%d\n", calibration_value);
+    fclose(pFile);
+    printf("%d\n", calibrationVal);
     return 0;
 }
