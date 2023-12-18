@@ -32,10 +32,29 @@ void replaceRight(struct node *root, struct node *replacement) {
     root->right = replacement;
 }
 
+int findEnd(struct node *root, struct node *end, char *directions) {
+    int res = 0;
+    struct node **pNode = &root;
+    while (*pNode != end) {
+        for (char *pDir = directions; *pDir != '\0'; pDir++, res++) {
+            if (*pNode == end) {
+                break;
+            }
+            printf("%s -> %c: ", (*pNode)->name, *pDir);
+            if (*pDir == 'L') {
+                pNode = &(*pNode)->left;
+            } else if (*pDir == 'R') {
+                pNode = &(*pNode)->right;
+            }
+            printf("%s\n", (*pNode)->name);
+        }
+    }
+    return res;
+}
+
 int main(int argc, char *argv[]) {
     (void)argc;
     FILE *pFile = fopen(argv[1], "r");
-    int res = 0;
     char buffer[500];
 
     // Get directions
@@ -91,21 +110,7 @@ int main(int argc, char *argv[]) {
 
     printf("Root: %s %s %s\n", root->name, root->left->name, root->right->name);
 
-    struct node **pNode = &root;
-    while (*pNode != end) {
-        for (char *pDir = directions; *pDir != '\0'; pDir++, res++) {
-            if (*pNode == end) {
-                break;
-            }
-            printf("%s -> %c: ", (*pNode)->name, *pDir);
-            if (*pDir == 'L') {
-                pNode = &(*pNode)->left;
-            } else if (*pDir == 'R') {
-                pNode = &(*pNode)->right;
-            }
-            printf("%s\n", (*pNode)->name);
-        }
-    }
+    int res = findEnd(root, end, directions);
 
     // Free nodes
     for (int i = 0; i < nodes.nodeCount; i++) {
